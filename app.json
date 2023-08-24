@@ -1,0 +1,14 @@
+{
+  "name": "WaterDrink",
+  "displayName": "WaterDrink",
+  "expo": {
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(WaterDrink) to access your camera."
+        }
+      ]
+    ]
+  }
+}
