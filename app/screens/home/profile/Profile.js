@@ -4,6 +4,8 @@ import {AppBar} from '../../../components/AppBar';
 import {colors} from '../../../config/styles';
 import Images from '../../../config/Images';
 
+import { useSelector, useDispatch } from 'react-redux';
+
 
 
 
@@ -61,6 +63,8 @@ const GoalProcessComponet =(text,colorNum)=>{
 }
 
 const Profile = props => {
+
+  const {userInfo} = useSelector((state) => (state.login))
   return (
     <View>
       <AppBar
@@ -82,7 +86,7 @@ const Profile = props => {
             <Image style={styles.imageprofole} source={Images.CHATBOT_USER} />
           </View>
           <View style={{flex: 2}}>
-            <Text>Nisal perera</Text>
+            <Text>{userInfo?.fullName}</Text>
             <Text>Patient helth details</Text>
           </View>
         </View>

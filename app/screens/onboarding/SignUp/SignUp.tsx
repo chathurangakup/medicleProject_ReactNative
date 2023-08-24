@@ -3,13 +3,15 @@ import { View, SafeAreaView, Text, Dimensions, StyleSheet, Image, ImageBackgroun
 import auth from '@react-native-firebase/auth';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { isLoginComplete } from '../Login/LoginSlice';
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
+import database from '@react-native-firebase/database';
 
 import Images from '../../../config/Images';
 import { colors } from '../../../config/styles';
 import TextInputCustom from '../../../components/TextInputField';
 import CustomButton from '../../../components/CustomButton';
 import BottomSignLinkText from '../../../components/BottomSignLinkText'
+import {updateUserInfo} from '../Login/LoginSlice'
 
 
 
@@ -63,14 +65,29 @@ const SignUpScreen: React.FC<SignUpScreenProps> = (props: any) => {
       setLoaderShow(true)
       auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(() => {
+        .then((userCredential) => {
           Alert.alert(
             "Success ✅", "Authenticated successfully"
           );
+          const userId = userCredential?.user?.uid;
+          console.log("user", userId)
+
+          database()
+          .ref('/users/'+userId)
+          .set({
+                username: username,
+                fullName: fullName,
+                email:email
+          })
+          .then(() => console.log('Data set.'));
+          let user={
+             "fullName": username,
+             "username": fullName
+          }
+          dispatch(updateUserInfo(user));
           dispatch(isLoginComplete(true));
           setLoaderShow(false)
           props.navigation.navigate('welcome')
-          setLoaderShow(false)
         })
         .catch(error => {
           if (error.code === 'auth/email-already-in-use') {
@@ -151,7 +168,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = (props: any) => {
             </View>
             : null
           }
-          <View style={{ padding: 10 }}></View>
+        
           <TextInputCustom
             value={password}
             onChangeText={(value) => passwordAdd(value)}

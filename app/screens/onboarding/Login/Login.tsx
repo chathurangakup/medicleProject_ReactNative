@@ -5,12 +5,15 @@ import type { RootState } from '../../../store'
 import { useSelector, useDispatch } from 'react-redux'
 import { isLoginComplete } from './LoginSlice';
 import Spinner from 'react-native-loading-spinner-overlay';
+import database from '@react-native-firebase/database';
 
 import Images from '../../../config/Images';
 import { colors } from '../../../config/styles';
 import TextInputCustom from '../../../components/TextInputField';
 import CustomButton from '../../../components/CustomButton';
 import BottomSignLinkText from '../../../components/BottomSignLinkText'
+
+import {updateUserInfo} from './LoginSlice'
 
 
 
@@ -47,28 +50,39 @@ const LoginScreen: React.FC<LoginScreenProps> = (props: any) => {
     if (email != '' && password != '') {
       setLoaderShow(true)
       auth()
-          .signInWithEmailAndPassword(email, password)
-          .then(() => {
-                 Alert.alert(
+        .signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          Alert.alert(
             "Success ✅", "Authenticated successfully"
           );
+          const userId = userCredential?.user?.uid;
+          console.log("user", userId)
+
+          database()
+            .ref('/users/'+userId)
+            .once('value')
+            .then(snapshot => {
+              console.log('User data: ', snapshot.val());
+              dispatch(updateUserInfo(snapshot.val()))
+            });
+
           dispatch(isLoginComplete(true));
           setLoaderShow(false)
           props.navigation.navigate('welcome')
-          })
-          .catch(error => {
-            if (error.code === 'auth/email-already-in-use') {
-              console.log('That email address is already in use!');
-              setLoaderShow(false)
-            }
-
-            if (error.code === 'auth/invalid-email') {
-              console.log('That email address is invalid!');
-              setLoaderShow(false)
-            }
+        })
+        .catch(error => {
+          if (error.code === 'auth/email-already-in-use') {
+            console.log('That email address is already in use!');
             setLoaderShow(false)
-            console.error(error);
-          });
+          }
+
+          if (error.code === 'auth/invalid-email') {
+            console.log('That email address is invalid!');
+            setLoaderShow(false)
+          }
+          setLoaderShow(false)
+          console.error(error);
+        });
 
       
       // try {

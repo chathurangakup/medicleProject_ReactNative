@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,28 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux'
 
 import Images from '../../config/Images';
 import {colors} from '../../config/styles';
 import CustomButton from '../../components/CustomButton';
+import {isChatbotComplete} from '../home/chatBot/ChatBotSlice'
 
 const window = Dimensions.get('window');
 
-const Welcome = (props) => {
+const Welcome = props=> {
+  const dispatch = useDispatch()
+  const {userInfo} = useSelector((state) => (state.login))
+
+  useEffect(()=>{
+    console.log("userInfouserInfo",userInfo)
+  },[])
+
+const click=()=>{
+   //dispatch(isChatbotComplete(true));
+   props.navigation.navigate('chatbot')
+}
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{height: '100%'}}>
@@ -28,7 +42,7 @@ const Welcome = (props) => {
         <View style={styles.textInputStylesContainer}>
           <Text style={styles.textFirstStyle}>WELCOME TO PHYSIODVYSOR</Text>
           <Text style={styles.textSecondStyle}>
-            HELLO NISAL,{'\n'}YOUR ACCOUNT HAS BEEN {'\n'} CREATED,{'\n'} LET'SGET YOU ONBOARDED!
+            HELLO {userInfo?.username},{'\n'}YOUR ACCOUNT HAS BEEN {'\n'} CREATED,{'\n'} LET'SGET YOU ONBOARDED!
           </Text>
         </View>
 
@@ -36,7 +50,7 @@ const Welcome = (props) => {
           style={{width: window.width / 1.5, paddingTop: window.height / 15,alignSelf:'center'}}>
           <CustomButton
             title="Begin"
-            onPress={() => props.navigation.navigate('chatbot')}
+            onPress={() =>  click()}
             btnStyle={{borderRadius: 40, height: window.height / 18}}
             textStyle={{fontSize: 18}}
           />

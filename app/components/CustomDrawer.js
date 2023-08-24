@@ -18,6 +18,7 @@ import { colors } from '../config/styles';
 
 const CustomDrawer = props => {
   const dispatch = useDispatch()
+  const {userInfo} = useSelector((state) => (state.login))
   const signOutUser = async () => {
     dispatch(isLoginComplete(false));
     dispatch(isChatbotComplete(false))
@@ -39,7 +40,7 @@ const CustomDrawer = props => {
         contentContainerStyle={{backgroundColor: '#8200d6'}}>
         <View  style={{padding:30,backgroundColor: '#8200d6'}}>
             <Image source={Images.CHATBOT_USER} style={{height:80,width:80,borderRadius:40, marginBottom:10}}></Image>
-            <Text style={{color:'#fff',fontSize: 18}}>Jhone Doe</Text>
+            <Text style={{color:'#fff',fontSize: 18}}>{userInfo?.fullName}</Text>
         </View>
         <View style={{flex:1,backgroundColor:'#fff',paddingTop: 10}}>
            <DrawerItemList {...props} />

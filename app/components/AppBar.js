@@ -28,6 +28,10 @@ export const AppBar = props => {
     // props.navigation.navigate('profileMain');
   };
 
+  const onPressBurgurMenu =()=>{
+     props.navigation.openDrawer();
+  }
+
   return (
     <View style={styles.root}>
       <View
@@ -46,7 +50,7 @@ export const AppBar = props => {
             </TouchableOpacity>
           )
         ) : (
-          <TouchableOpacity onPress={() => onPressProfile()}>
+          <TouchableOpacity onPress={() => onPressBurgurMenu()}>
             <Icon name="menu" size={30} color={colors.blackColor} />
           </TouchableOpacity>
         )}
