@@ -11,6 +11,7 @@ import logger from 'redux-logger';
 import commonReducer from './slices/CommonSlices';
 import loginReducer from './screens/onboarding/Login/LoginSlice';
 import chatbotSlice from './screens/home/chatBot/ChatBotSlice';
+import exerciseFeedbackSlice from './screens/home/exerciseFeedback/ExerciseFeedbackSlice';
 
 
 
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
     common: commonReducer,
     login: loginReducer,
     chatbot: chatbotSlice,
+    feedback:exerciseFeedbackSlice
 })
 
 // const store = configureStore({

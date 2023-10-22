@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "860969303596",
+    "project_id": "medicleproject",
+    "storage_bucket": "medicleproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:860969303596:android:7f0569601473694e88db89",
+        "android_client_info": {
+          "package_name": "com.chathu.medicle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "860969303596-teqv8qeo6kdo4te8l23hts2at8hvsiuv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlirMHkuC20_9Y_msOdYElD4PRf-xiFoM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "860969303596-teqv8qeo6kdo4te8l23hts2at8hvsiuv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

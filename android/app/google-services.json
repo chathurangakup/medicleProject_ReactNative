@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "860969303596",
-    "project_id": "medicleproject",
-    "storage_bucket": "medicleproject.appspot.com"
+    "project_number": "442499446527",
+    "project_id": "medicalproject-9f7cf",
+    "storage_bucket": "medicalproject-9f7cf.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:860969303596:android:7f0569601473694e88db89",
+        "mobilesdk_app_id": "1:442499446527:android:09752d9d3e50c54241feca",
         "android_client_info": {
           "package_name": "com.chathu.medicle"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "860969303596-teqv8qeo6kdo4te8l23hts2at8hvsiuv.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDlirMHkuC20_9Y_msOdYElD4PRf-xiFoM"
+          "current_key": "AIzaSyAPjqSht_Ag7fGrYD699kA4aSUjgENSNO8"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "860969303596-teqv8qeo6kdo4te8l23hts2at8hvsiuv.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
