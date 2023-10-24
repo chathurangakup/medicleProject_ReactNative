@@ -38,7 +38,7 @@ const ExercisePlan = ({route, navigation}) => {
   const {videoPathKey} = route.params;
   const [videoUploadUrl, setVideoUploadUrl] = useState('');
   const [loaderShow, setLoaderShow] = useState(false);
-  const {userShouldDoExercises,userChat} = useSelector((state) => state.chatbot)
+
   const {userInfo} = useSelector((state) => (state.login))
   const [userIllness, setIllness] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
@@ -51,11 +51,17 @@ const ExercisePlan = ({route, navigation}) => {
 
   // const [exercise_name, setExerciseName] = useState('')
 
+  // var dataArray = str.split(" ");
+
+  const {userShouldDoExercises,userChat} = useSelector((state) => state.chatbot)
+   var userShouldDoExercisesArray = userShouldDoExercises.split(/ (?=\d)/);
+
   const exercises = [
     "1.Multiplane shoulder  exercise -rhythmic stablizing ",
     "2.Isometrics  shoulder abduction",
     "3.Isometrics  shoulder external rotation",
-    "4.chair squats"
+    "4.chair squats",
+    "5.fasia_strech"
   ]
 
 
@@ -301,9 +307,20 @@ const clickExercise=(items)=>{
   const stringWithUnderscores = items.replace(/ /g, "_");
   const parts = stringWithUnderscores.split('.');
   const textAfterDot = parts.length > 1 ? parts[1] : '';
-  const stringWithoutTrailingUnderscore = textAfterDot.replace(/_+$/, '');
-  setExerciseName(stringWithoutTrailingUnderscore)
-  //alert(stringWithoutTrailingUnderscore.toLowerCase());  
+  console.log("textAfterDot",textAfterDot)
+  var lastUnderscoreIndex = textAfterDot.lastIndexOf("_");
+
+if (lastUnderscoreIndex !== -1 && lastUnderscoreIndex === textAfterDot.length - 1) {
+  var updatedStr = textAfterDot.slice(0, -1); // Remove the last character (the underscore)
+} else {
+  var updatedStr = textAfterDot; // No trailing underscore found, keep the original string
+}
+
+console.log(updatedStr);
+ // const stringWithoutTrailingUnderscore = textAfterDot.replace(/_+$/, '');
+  // var updatedStr = stringWithoutTrailingUnderscore.replace(/_$/, ' ');
+  setExerciseName(updatedStr.toLowerCase())
+  //alert();  
 }
 
   
@@ -330,9 +347,9 @@ const clickExercise=(items)=>{
               paddingBottom: 20,
               paddingLeft: 20,
             }}>
-            <Text style={{color: 'black'}}>{userShouldDoExercises}</Text>
+            {/* <Text style={{color: 'black'}}>{userShouldDoExercisesArray}</Text> */}
 
-           {exercises.map((items) =>
+           {userShouldDoExercisesArray.map((items) =>
               <TouchableOpacity onPress={()=>clickExercise(items)}>
                   <Text style={{color:'black', padding:10}}>{items}</Text>
               </TouchableOpacity>

@@ -27,8 +27,8 @@ const Welcome = props=> {
   },[])
 
 const click=()=>{
-   dispatch(isChatbotComplete(true));
-  // props.navigation.navigate('chatbot')
+  // dispatch(isChatbotComplete(true));
+   props.navigation.navigate('chatbot')
 }
 
   return (

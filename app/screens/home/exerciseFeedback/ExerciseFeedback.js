@@ -5,6 +5,7 @@ import storage from '@react-native-firebase/storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector, useDispatch } from 'react-redux'
+import moment from 'moment';
 
 import {AppBar} from '../../../components/AppBar';
 import Images from '../../../config/Images';
@@ -276,9 +277,15 @@ const onPressSight =(qnum)=>{
 
 
 const upload =()=>{
+  var timestamp= moment().utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss a');
+ var data= 
   firestore()
   .collection('Feedback')
-  .add({userFeedback})
+  .add({
+    "timestamp":timestamp,
+    "userFeedback":userFeedback
+   }
+  )
   .then(() => {
     console.log('User added!');
   });
