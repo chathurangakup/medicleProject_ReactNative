@@ -380,14 +380,14 @@ console.log(updatedStr);
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             <View style={{flex:1, margin:10}}>
              {btnCommon(() => chooseFile('video'), 'Choose Video')}
-             {btnCommon(() => navigation.navigate('exerciseFeedback',
+             {/* {btnCommon(() => navigation.navigate('exerciseFeedback',
                 {
                   correct_squats: 2, //correct_squats,
                   exercise_name:'exercise_name',
                   incorrect_squats:1,
                   num_total_squats:3,
                   time_stamp:'time_stamp'
-                }), 'Begin')}
+                }), 'Begin')} */}
 
             </View>
             <View style={{flex:1,margin:10}}>

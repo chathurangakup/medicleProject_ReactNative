@@ -37,6 +37,8 @@ const ExerciseFeedback = ({route, navigation}) => {
   const [q3moderate, setQ3OnPressModerate] =useState(true);
   const [q3serve, setQ3OnPressServe] =useState(true);
 
+  const [recovery_duration, setRecovery_duration] = useState(0)
+
   const [q1ans, setQ1Ans] =useState('');
   const [q2ans, setQ2Ans] =useState('');
   const [q3ans, setQ3Ans] =useState('');
@@ -276,10 +278,10 @@ const onPressSight =(qnum)=>{
 }
 
 
-const upload =()=>{
+const upload =async()=>{
   var timestamp= moment().utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss a');
  var data= 
-  firestore()
+   firestore()
   .collection('Feedback')
   .add({
     "timestamp":timestamp,
@@ -290,12 +292,18 @@ const upload =()=>{
     console.log('User added!');
   });
   dispatch(clearUserFeedback())
-  navigation.navigate('exercisePlan',{
-    videoPathKey: '',
-  }) 
+  // navigation.navigate('exercisePlan',{
+  //   videoPathKey: '',
+  // }) 
+
+  const usersCollection = await firestore()
+  .collection('Recovery_days')
+  .orderBy("timestamp", "desc")
+  .get()
+  setRecovery_duration(usersCollection?._docs[0]?._data?.recovery_duration)
 }
 
-const submit =()=>{
+const submit =async()=>{
   if(q1ans!=='' && q2ans!==''&& q3ans!==''){
     if(userFeedback.length !==0){
     
@@ -366,6 +374,7 @@ const submit =()=>{
     alert('Please select answers')
   }
   
+
 }
  
 
@@ -451,6 +460,8 @@ const btnCommon = (onPress, text) => {
         </View>:
         <View style={{padding:40}}>
         {btnCommon(() => submit(), 'Submit')}
+
+        <Text style={{color:'#000', padding: 10}}>Recovery Duration: {recovery_duration}</Text>
         </View>
 
         }
