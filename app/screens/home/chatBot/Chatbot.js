@@ -17,7 +17,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import {AppBar} from '../../../components/AppBar';
 import {colors} from '../../../config/styles';
 import Images from '../../../config/Images';
-import {isChatbotComplete,updateChatWithUserDataArray,identifiedUserExercises,updateUserChat} from './ChatBotSlice'
+import {isChatbotComplete,updateChatWithUserDataArray,identifiedUserExercises,updateUserChat,setLegOrHanddata} from './ChatBotSlice'
 
 const {width, height} = Dimensions.get('window');
 
@@ -56,7 +56,7 @@ const Chatbot = props => {
         })
       });
       const jsonText = await response.json();
-       console.log(jsonText)
+       console.log(jsonText) 
     //  let text= "Hi! How may I help you? Are you facing any of these problems: Upper Limb | Lower Limb"
     if(jsonText.length==1){
 
@@ -152,6 +152,12 @@ const Chatbot = props => {
     setQuection(selectOption)
     // clearInterval(intervalId);
      setShowNextButton(true);
+     if(selectOption==" Upper Limb "){
+      dispatch(setLegOrHanddata('Leg'))
+     }
+     if(selectOption==" Lower Limb"){
+      dispatch(setLegOrHanddata('Hand'))
+     }
   
   };
 

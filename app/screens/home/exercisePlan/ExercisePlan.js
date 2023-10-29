@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, Image, TouchableOpacity, Dimensions,Platform,PermissionsAndroid,ScrollView} from 'react-native';
+import {Text, View, Image, TouchableOpacity, Dimensions,Platform,PermissionsAndroid,ScrollView, Modal,StyleSheet,Pressable} from 'react-native';
 import VideoPlayer from 'react-native-video-player';
 import storage from '@react-native-firebase/storage';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -49,9 +49,13 @@ const ExercisePlan = ({route, navigation}) => {
   const [num_total_squats, setNumTotalSquats] = useState(0)
   const [time_stamp, setTimeStamp] = useState('')
 
+  const {userFeedback} = useSelector((state) => (state.feedback))
+
   // const [exercise_name, setExerciseName] = useState('')
 
   // var dataArray = str.split(" ");
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const {userShouldDoExercises,userChat} = useSelector((state) => state.chatbot)
    var userShouldDoExercisesArray = userShouldDoExercises.split(/ (?=\d)/);
@@ -94,7 +98,7 @@ const ExercisePlan = ({route, navigation}) => {
 
 
   const getData=async()=>{
-    // alert(exercise_name)
+    //  alert(exercise_name)
     const usersCollection =await firestore().collection('Users').doc('test1').collection('exercises').doc(exercise_name).get();
     console.log("usersCollection",usersCollection._data);
     setLoaderShow(true)
@@ -272,6 +276,7 @@ const ExercisePlan = ({route, navigation}) => {
   //   let lastElementChatUser = userChat[userChat.length-1];
   //   console.log('lastElementChatUser',lastElementChatUser)
   //  setIllness(lastElementChatUser.quection)
+
   captureImage()
   requestExternalWritePermission()
 
@@ -307,22 +312,31 @@ const clickExercise=(items)=>{
   const stringWithUnderscores = items.replace(/ /g, "_");
   const parts = stringWithUnderscores.split('.');
   const textAfterDot = parts.length > 1 ? parts[1] : '';
-  console.log("textAfterDot",textAfterDot)
-  var lastUnderscoreIndex = textAfterDot.lastIndexOf("_");
+  // console.log("textAfterDot",textAfterDot)
+  // var remove_ = textAfterDot.toString().replace(/_$/, '')
 
-if (lastUnderscoreIndex !== -1 && lastUnderscoreIndex === textAfterDot.length - 1) {
-  var updatedStr = textAfterDot.slice(0, -1); // Remove the last character (the underscore)
-} else {
-  var updatedStr = textAfterDot; // No trailing underscore found, keep the original string
-}
 
-console.log(updatedStr);
+// console.log(remove_);
  // const stringWithoutTrailingUnderscore = textAfterDot.replace(/_+$/, '');
   // var updatedStr = stringWithoutTrailingUnderscore.replace(/_$/, ' ');
-  setExerciseName(updatedStr.toLowerCase())
+  var lovercaseExer = textAfterDot.toLowerCase()
+  
+  console.log(lovercaseExer)
+  var stringExerciseName = (lovercaseExer).toString()
+  console.log('stringExerciseName',stringExerciseName)
+  setExerciseName((stringExerciseName.trim().replace(/_$/, '')))
   //alert();  
 }
 
+
+const showdaily = ()=>{
+  if(userFeedback.length==0){
+   alert('no Report')
+  }else{
+    setModalVisible(true)
+  }
+ 
+}
   
 
   return (
@@ -371,7 +385,10 @@ console.log(updatedStr);
           </View>
    
         </View>
-        <Text style={{color: 'black', padding:10}}>{exercise_name}</Text>
+        <View style={{padding:10}}>
+        <Text style={{color: 'black' }}>{exercise_name}</Text>
+        </View>
+       
         <View style={{alignSelf: 'flex-end', marginRight: 50, marginTop: 20}}>
           {btnCommon(() => navigation.navigate('videoRecord'), 'Start')}
 
@@ -380,6 +397,11 @@ console.log(updatedStr);
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             <View style={{flex:1, margin:10}}>
              {btnCommon(() => chooseFile('video'), 'Choose Video')}
+             <View style={{padding:10}}>
+             {btnCommon(() => showdaily(), 'Show Daily Report')}
+             </View>
+           
+            
              {/* {btnCommon(() => navigation.navigate('exerciseFeedback',
                 {
                   correct_squats: 2, //correct_squats,
@@ -433,6 +455,8 @@ console.log(updatedStr);
             </View>
           </View>
         ) : null}
+
+    
 
       {videoUploadUrl  == '' ? (
         videoPathKey !== '' ? (
@@ -502,11 +526,113 @@ console.log(updatedStr);
           
           </View>}
           <Spinner visible={loaderShow} />
+
+        
+
+          <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <ScrollView style={styles.modalView} >
+          <Text style={{color:'black', fontWeight:'bold',    textAlign: 'center',fontSize:25, padding:10}}>Daily Exercise Feedback</Text>
+          {userFeedback.map((items, index) =>
+          <View style={{padding:10}}>
+            <Text style={{color:'black', fontSize: 20}}> Day {index+1}</Text>
+            <Text style={styles.modalText}>Correct Squate: {items?.correct_squats}</Text>
+            <Text style={styles.modalText}>Exercise Name: {items?.exercise_name}</Text>
+            <Text style={styles.modalText}>Incorrect squats: {items?.incorrect_squats}</Text>
+            <Text style={styles.modalText}>Num Total squats: {items?.num_total_squats}</Text>
+            <Text style={{color:'black', fontWeight:'bold',marginBottom: 15,
+    textAlign: 'center',
+    color:'black',
+    paddingLeft: 20,
+    flex:2}}>Date Time: {items?.time_stamp}</Text>
+            {/* {items.quections.map((item)=>
+          
+            )} */}
+            <View style={{flexDirection:'row', justifyContent:'flex-start'}}>
+              <Text style={styles.modalText}>{items.quections[0].q1}</Text>
+              <Text style={{color:'black', fontWeight:'bold',flex:1}}> {(items.quections[0]?.ans1).toString()}</Text>
+            </View>
+            <View style={{flexDirection:'row',  justifyContent:'flex-start'}}>
+              <Text style={styles.modalText}>{items.quections[1].q2}</Text>
+              <Text style={{color:'black', fontWeight:'bold',flex:1}}> {items.quections[1]?.ans1}</Text>
+            </View>
+            <View style={{flexDirection:'row',  justifyContent:'flex-start'}}>
+              <Text style={styles.modalText}>{items.quections[2].q3}</Text>
+              <Text style={{color:'black', fontWeight:'bold',flex:1}}> {items.quections[2]?.ans1}</Text>
+            </View>
+          </View>
+          )}
+            <View style={{marginBottom:40}}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </Pressable>
+            </View>
+          
+          </ScrollView>
+        </View>
+      </Modal>
          
           </ScrollView>
          
     </View>
   );
-};
+}
+
+const styles = StyleSheet.create({
+  centeredView: {
+
+    justifyContent: 'center',
+    alignItems: 'center',
+    height:'100%'
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    height: '100%'
+
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    color:'black',
+    paddingLeft: 20,
+    flex:2
+  },
+});
 
 export default ExercisePlan;

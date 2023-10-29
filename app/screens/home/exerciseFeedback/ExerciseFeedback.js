@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, Image, TouchableOpacity, Dimensions} from 'react-native';
+import {Text, View, Image, TouchableOpacity, Dimensions, Modal,Pressable,StyleSheet, ScrollView} from 'react-native';
 import VideoPlayer from 'react-native-video-player';
 import storage from '@react-native-firebase/storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector, useDispatch } from 'react-redux'
 import moment from 'moment';
+
 
 import {AppBar} from '../../../components/AppBar';
 import Images from '../../../config/Images';
@@ -21,6 +22,10 @@ const ExerciseFeedback = ({route, navigation}) => {
   const dispatch = useDispatch();
   const {userFeedback} = useSelector((state) => (state.feedback))
   const [quectionOne, setQuectionOne] =useState('')
+  const [loaderShow, setLoaderShow] = useState(false);
+
+  const {legOrHand} = useSelector((state) => state.chatbot)
+  const [legOrHandState, setLegOrHand] =useState(String(legOrHand));
 
   const [q1none, setQ1OnPressNone] =useState(true);
   const [q1sight, setQ1OnPressSight] =useState(true);
@@ -35,9 +40,14 @@ const ExerciseFeedback = ({route, navigation}) => {
   const [q3none, setQ3OnPressNone] =useState(true);
   const [q3sight, setQ3OnPressSight] =useState(true);
   const [q3moderate, setQ3OnPressModerate] =useState(true);
-  const [q3serve, setQ3OnPressServe] =useState(true);
+  const [q3serve, setQ3OnPressServe] =useState(true); 
+
+  const [painLevel, setPainLevel] =useState(-1); 
 
   const [recovery_duration, setRecovery_duration] = useState(0)
+  const [pain_level_fromFireB, setPainLevelFromFireB] = useState(0)
+  const [sum_correct, setSumCorrict] = useState(0)
+  const [sum_incorrect, setSumIncorrect] = useState(0)
 
   const [q1ans, setQ1Ans] =useState('');
   const [q2ans, setQ2Ans] =useState('');
@@ -45,6 +55,8 @@ const ExerciseFeedback = ({route, navigation}) => {
   const [q4ans, setQ4Ans] =useState('');
 
   const [showUploadDataBtn, setShowUploadDataBtn] =useState(false);
+
+  const [modalVisible, setModalVisible] = useState(true);
 
   
 
@@ -161,8 +173,8 @@ const ExerciseFeedback = ({route, navigation}) => {
   
 
   useEffect(()=>{
-    getData();
-    if(userFeedback.length ==8  ){
+   getData();
+    if(userFeedback.length ==7  ){
       setShowUploadDataBtn(true)
       
   }else{
@@ -280,6 +292,7 @@ const onPressSight =(qnum)=>{
 
 const upload =async()=>{
   var timestamp= moment().utcOffset('+05:30').format('YYYY-MM-DD hh:mm:ss a');
+  setLoaderShow(true)
  var data= 
    firestore()
   .collection('Feedback')
@@ -296,15 +309,25 @@ const upload =async()=>{
   //   videoPathKey: '',
   // }) 
 
-  const usersCollection = await firestore()
-  .collection('Recovery_days')
-  .orderBy("timestamp", "desc")
-  .get()
-  setRecovery_duration(usersCollection?._docs[0]?._data?.recovery_duration)
+
+  setTimeout(async() => {
+    console.log("Delayed for 1 second.");
+    const usersCollection = await firestore()
+    .collection('Recovery_days')
+    .orderBy("timestamp", "desc")
+    .get()
+    setRecovery_duration(usersCollection?._docs[0]?._data?.recovery_duration)
+    setPainLevelFromFireB(usersCollection?._docs[0]?._data?.pain_level)
+    setSumCorrict(usersCollection?._docs[0]?._data?.sum_correct)
+    setSumIncorrect(usersCollection?._docs[0]?._data?.sum_incorrect)
+    setLoaderShow(false)
+  }, 60000);
+
 }
 
 const submit =async()=>{
-  if(q1ans!=='' && q2ans!==''&& q3ans!==''){
+
+  if(q1ans!=='' && painLevel!==-1 && q3ans!==''){
     if(userFeedback.length !==0){
     
       let userFeedbackData = userFeedback
@@ -317,13 +340,17 @@ const submit =async()=>{
         'time_stamp':  "2023:10:10:20:58:51",
          'quections': [
           {
-            'q1':'Did you feel pain in your natural hand?' ,
-            'ans1': q1ans
+            'q1':'How was your  pain level after doing exercise?',
+            'ans1': painLevel
           },
           {
-            'q2':'Was it difficult to stretch your stump?' ,
-            'ans1':q2ans
+            'q2':'Did you feel pain in your natural '+legOrHand+'?',
+            'ans1': q1ans
           },
+          // {
+          //   'q2':'Was it difficult to stretch your stump?' ,
+          //   'ans1':q2ans
+          // },
           {
             'q3':'Did you feel brusies/burns on your stump skin?' ,
             'ans1':q3ans
@@ -349,14 +376,18 @@ const submit =async()=>{
          'num_total_squats':  num_total_squats,
          'time_stamp':  "2023:10:10:20:58:51",
           'quections': [
+            {
+              'q1':'How was your  pain level after doing exercise?',
+              'ans1': painLevel
+            },
            {
-             'q1':'Did you feel pain in your natural hand?' ,
+             'q2':'Did you feel pain in your natural ' +legOrHand+'?' ,
              'ans1': q1ans
            },
-           {
-             'q2':'Was it difficult to stretch your stump?' ,
-             'ans1':q2ans
-           },
+          //  {
+          //    'q2':'Was it difficult to stretch your stump?' ,
+          //    'ans1':q2ans
+          //  },
            {
              'q3':'Did you feel brusies/burns on your stump skin?' ,
              'ans1': q3ans
@@ -378,6 +409,10 @@ const submit =async()=>{
 }
  
 
+
+const onPressPainLevel=(painLevel)=>{
+  setPainLevel(painLevel)
+}
 
 
 
@@ -447,11 +482,51 @@ const btnCommon = (onPress, text) => {
            <Text style={{fontSize:18}}>Totle Squats: </Text>
            <Text style={{fontSize:18}}>{num_total_squats} </Text>
         </View>
-        
-        {textBtnComponent(1,'Did you feel pain in your natural hand?',()=>onPressNone(1),()=>onPressModarate(1),()=>onPressSight(1),()=>onPressServe(1))}
-        {textBtnComponent(2,'Was it difficult to stretch your stump?',()=>onPressNone(2),()=>onPressModarate(2),()=>onPressSight(2),()=>onPressServe(2))}
+        <View  style={{
+          paddingLeft: 30,
+          paddingRight: 30,
+          paddingTop: 10,
+          paddingBottom: 10,
+        }}>
+        <Text style={{ color: colors.white,padding:6, fontSize: 21}}>How was your  pain level after doing exercise?</Text>
+        <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(0)}>
+            <Text >0</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(1)}>
+            <Text >1</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(2)}>
+            <Text >2</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(3)}>
+            <Text >3</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(4)}>
+            <Text >4</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(5)}>
+            <Text >5</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(6)}>
+            <Text >6</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(7)}>
+            <Text >7</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(8)}>
+            <Text >8</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1, borderRadius: 20, backgroundColor:colors.ansBtnColor, alignItems:'center', margin:3}} onPress={()=>onPressPainLevel(9)}>
+            <Text >9</Text>
+          </TouchableOpacity>
+        </View>
+        <Text>Pain Level : {painLevel}</Text>
+        </View>
+       
+        {textBtnComponent(1,'Did you feel pain in your natural '+legOrHandState+'?',()=>onPressNone(1),()=>onPressModarate(1),()=>onPressSight(1),()=>onPressServe(1))}
+        {/* {textBtnComponent(2,'Was it difficult to stretch your stump?',()=>onPressNone(2),()=>onPressModarate(2),()=>onPressSight(2),()=>onPressServe(2))} */}
         {textBtnComponent(3,'Did you feel brusies/burns on your stump skin?',()=>onPressNone(3),()=>onPressModarate(3),()=>onPressSight(3),()=>onPressServe(3))}
-
         {
           showUploadDataBtn==true?
           <View style={{padding:40}}>
@@ -461,16 +536,97 @@ const btnCommon = (onPress, text) => {
         <View style={{padding:40}}>
         {btnCommon(() => submit(), 'Submit')}
 
-        <Text style={{color:'#000', padding: 10}}>Recovery Duration: {recovery_duration}</Text>
+       
         </View>
 
         }
       
 
       </View>
-     
+      <Spinner visible={loaderShow} />
+    {recovery_duration !==0 ?
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <ScrollView style={styles.modalView} >
+          <Text style={{color:'black', fontWeight:'bold',    textAlign: 'center',fontSize:25, padding:10}}>Weekly Exercise Feedback</Text>
+
+          <Text style={{color:'black', padding:10}}>Pain Level : {pain_level_fromFireB}</Text>
+          <Text style={{color:'#000', padding: 10}}>Recovery Duration: {recovery_duration}</Text>
+          <Text style={{color:'black', padding:10}}>Sum Corrict : {sum_correct}</Text>
+          <Text style={{color:'black', padding:10, marginBottom:50}}>Sum Incorrect : {sum_incorrect}</Text>
+            <View style={{marginBottom:40}}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </Pressable>
+            </View>
+          
+          </ScrollView>
+        </View>
+      </Modal>
+      :null
+    
+    }
+   
     </View>
   );
 };
+
+
+const styles = StyleSheet.create({
+  centeredView: {
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+  },
+  modalView: {
+   marginTop: 150,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+
+
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    color:'black',
+    paddingLeft: 20,
+    flex:2
+  },
+});
 
 export default ExerciseFeedback;

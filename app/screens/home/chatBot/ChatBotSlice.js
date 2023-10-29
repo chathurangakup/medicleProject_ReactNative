@@ -3,7 +3,8 @@ import {createSlice} from '@reduxjs/toolkit'; //next js redux toolkit
 const  initialState= {
     isCompleteChatbot: false,
     userShouldDoExercises:'',
-    userChat:[]
+    userChat:[],
+    legOrHand:''
 }
 
 
@@ -20,8 +21,11 @@ export const chatbotSlice = createSlice({
      updateUserChat: (state,action) => {
       state.userChat = action.payload;
      },
+     setLegOrHanddata: (state,action) => {
+      state.legOrHand = action.payload;
+     },
   },
 });
 // case under reducers becomes an action
-export const {isChatbotComplete,identifiedUserExercises,updateUserChat} = chatbotSlice.actions;
+export const {isChatbotComplete,identifiedUserExercises,updateUserChat,setLegOrHanddata} = chatbotSlice.actions;
 export default chatbotSlice.reducer;
